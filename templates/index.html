@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News Origin Tracer</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="badge">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                </svg>
+                AI-Powered Document Intelligence
+            </div>
+            
+            <h1>
+                <span class="title-main">News Origin</span><br>
+                <span class="title-gradient">based on the AI tech</span>
+            </h1>
+            
+            <p class="subtitle">
+                Powerful AI-driven analysis to trace news origins and verify credibility from your understanding of the entire evidence in plain English
+            </p>
+            
+            <div class="disclaimer">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                <span><strong>Disclaimer:</strong> This tool provides automated analysis based on public metadata and should not be considered a definitive source of truth. Results are for informational purposes only.</span>
+            </div>
+        </header>
+        
+        <!-- Input Section -->
+        <div class="input-section">
+            <form id="traceForm">
+                <div class="input-group">
+                    <label for="inputData">Enter a news URL or keyword:</label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="text" 
+                            id="inputData" 
+                            name="input_data" 
+                            placeholder="e.g., https://example.com/article or 'artificial intelligence'"
+                            required
+                        >
+                        <svg class="input-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Input Type:</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="input_type" value="url" checked>
+                            <span>URL</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="input_type" value="keyword">
+                            <span>Keyword</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <button type="submit" id="submitBtn" class="btn-primary">Get started</button>
+            </form>
+        </div>
+        
+        <!-- Loading -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p class="loading-text">Analyzing news propagation...</p>
+            <p class="loading-subtext">This may take a few moments.</p>
+        </div>
+        
+        <!-- Error -->
+        <div class="error" id="error"></div>
+        
+        <!-- Results -->
+        <div class="results" id="results">
+            <div class="results-grid">
+                <!-- Graph Container -->
+                <div class="graph-container">
+                    <div class="card-header">
+                        <div class="icon-wrapper">
+                            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                            </svg>
+                        </div>
+                        <h2>Propagation Network</h2>
+                    </div>
+                    <div id="graph"></div>
+                </div>
+                
+                <!-- Sidebar -->
+                <div class="sidebar">
+                    <!-- Summary Card -->
+                    <div class="summary-card">
+                        <div class="card-header">
+                            <div class="icon-wrapper">
+                                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                                </svg>
+                            </div>
+                            <h3>Summary Report</h3>
+                        </div>
+                        <div id="summaryContent"></div>
+                    </div>
+                    
+                    <!-- Legend Card -->
+                    <div class="legend-card">
+                        <h3>Credibility Legend</h3>
+                        <div class="legend-item">
+                            <div class="legend-color green"></div>
+                            <span>High Credibility (7-10)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color yellow"></div>
+                            <span>Medium Credibility (4-6)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color red"></div>
+                            <span>Low Credibility (0-3)</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Performance Card -->
+                    <div class="performance-card">
+                        <div class="card-header">
+                            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <h3>Analysis Complete</h3>
+                        </div>
+                        <p id="performanceText"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Demo Instructions -->
+        <div class="demo-instructions" id="demoInstructions">
+            <div class="demo-icon">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                </svg>
+            </div>
+            <h2>Integrate the AI support</h2>
+            <p>Enter any URL or keyword (e.g., "artificial intelligence") and click "Get started" to see the analysis in action</p>
+        </div>
+    </div>
+    
+    <div class="tooltip" id="tooltip"></div>
+    
+    <script src="{{ url_for('static', filename='js/visualizer.js') }}"></script>
+</body>
+</html>
